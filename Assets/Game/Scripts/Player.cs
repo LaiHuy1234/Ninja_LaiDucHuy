@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : Character
-{
+{   
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float speed = 5;
@@ -16,14 +16,15 @@ public class Player : Character
     private bool isAttack = false;
     private bool isDeath = false;
     private float horizontal;
-
-
     private int coin = 0;
 
     private Vector3 savePoint;
-    
 
 
+    private void Awake()
+    {
+        coin = PlayerPrefs.GetInt("coin", 0);
+    }
 
     // Start is called before the first frame update
 
@@ -113,6 +114,7 @@ public class Player : Character
         DeActiveAttack();
 
         SavePoint();
+        UIManager.instance.SetCoin(coin);
     }
 
     public override void OnDespawm()
@@ -133,7 +135,7 @@ public class Player : Character
         return hit.collider != null;
     }
 
-    private void Attack()
+    public void Attack()
     {
         ChangeAnim("attack");
         isAttack = true;
@@ -142,7 +144,7 @@ public class Player : Character
         Invoke(nameof(DeActiveAttack), 0.5f);
     }
 
-    private void Throw()
+    public void Throw()
     {
         ChangeAnim("throw");
         isAttack = true;
@@ -157,7 +159,7 @@ public class Player : Character
         isAttack = false;
     }
 
-    private void Jump()
+    public void Jump()
     {
         isJumping = true;
         ChangeAnim("jump");
@@ -190,6 +192,8 @@ public class Player : Character
         if (collision.tag == "Coin")
         {
             coin++;
+            PlayerPrefs.SetInt("coin", coin);
+            UIManager.instance.SetCoin(coin);
             Destroy(collision.gameObject);
         }
 
